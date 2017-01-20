@@ -1,15 +1,17 @@
 package SLAETT;
 
-public interface INumber {
-	public INumber zero();			// 0
-	public INumber toNumber(int k);	// (Number)k
+public interface INumber<T> extends Comparable<INumber<T>> {
+	public T value();
+	public INumber<T> zero();			// 0
+	public INumber<T> identity();		// 1
+	public INumber<T> toNumber(int k);	// (Number)k
 	
-	public INumber neg();			// -this
-	public INumber rev();			// 1/this
-	public INumber sqrt();			// sqrt(this)
-	public INumber add(INumber n);	// this + n
-	public INumber sub(INumber n);	// this - n
-	public INumber mul(INumber n);	// this * n
-	public INumber div(INumber n);	// this / n
+	public INumber<T> neg();			// -this
+	public INumber<T> rev();			// 1/this
+	public INumber<T> sqrt();			// sqrt(this)
+	public INumber<T> add(T n);	// this + n
+	public INumber<T> sub(T n);	// this - n
+	public INumber<T> mul(T n);	// this * n
+	public INumber<T> div(T n);	// this / n
 	
 }

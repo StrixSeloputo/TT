@@ -1,6 +1,6 @@
 package SLAETT;
 
-public class MultiIndex {
+public class MultiIndex implements Comparable<MultiIndex>{
 	public MultiIndex() {}
 	public MultiIndex(int dim)
 	{
@@ -10,7 +10,28 @@ public class MultiIndex {
 	{
 		_indices = indices.clone();
 	}
-	
+
+	@Override
+	public int compareTo(MultiIndex other) {
+		if (dim() != other.dim())
+			throw new IllegalArgumentException(
+					"Error in MultiIndex::compareTo(MultiIndex): dimentions of multi-index are different"
+				);
+		for (int i = 0; i < dim(); i++) 
+		{
+			int sgn = (_indices[i]-other._indices[i])/Math.abs(_indices[i]-other._indices[i]);
+			if (sgn != 0)
+				return sgn;
+		}
+		return 0;
+	}
+
+	public boolean isValidIndex() {
+		for (int i = 0; i < dim(); i++)
+			if (_indices[i] < 0)
+				return false;
+		return true;
+	}
 	public int dim()
 	{
 		return _indices.length;
@@ -22,6 +43,21 @@ public class MultiIndex {
 			d += component;
 		return d;
 	}
+	public MultiIndex inc(MultiIndex sup)
+	{
+		if (this.compareTo(sup) >= 0)
+			throw new IllegalArgumentException(
+					"Error in MultiIndex::inc(MultiIndex): supremum is reached"
+				);
+		MultiIndex next = clone();
+		for (int d = dim()-1; d >= 0; d--)
+		{
+			next._indices[d]++;
+			if (next._indices[d] < sup._indices[d])
+				return next;
+		}
+		return next;
+	}
 	public int component(int i)
 	{
 		if (0 >= i|| i >= _indices.length)
@@ -30,6 +66,16 @@ public class MultiIndex {
 				);
 		
 		return _indices[i];
+	}
+	public MultiIndex setComponent(int i, int n_i)
+	{
+		if (0 >= i|| i >= _indices.length)
+			throw new IllegalArgumentException(
+					"Error in MultiIndex::getComponent(): you can't get component - dimention of multi-index don't allow"
+				);
+		MultiIndex changed = clone();
+		changed._indices[i] = n_i;
+		return changed;
 	}
 	public int value(MultiIndex tenzorDim, boolean fromLeftToRight)
 	{

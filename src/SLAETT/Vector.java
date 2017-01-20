@@ -14,8 +14,15 @@ public class Vector {
 	public int dim()
 	{
 		return _values.length;
+	}	
+	public INumber norm() {
+		INumber norm = _values[0].zero();
+		for (INumber val : _values)
+		{
+			norm = norm.add(val.mul(val));
+		}
+		return norm.sqrt();
 	}
-	
 	public Vector neg() 
 	{
 		Vector v = clone();
@@ -23,20 +30,65 @@ public class Vector {
 			v._values[i] = v._values[i].neg();
 		return v;
 	}
-	public Vector add(Vector n) 
+	public INumber component(int i)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		if (i >= dim())
+			throw new IllegalArgumentException(
+					"Error in Vector::component(int): illegal index - dimention must be less than it"
+				);
+		return _values[i];
 	}
-	public Vector sub(Vector n) 
+	public Vector setComponent(int i, INumber v_i)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		Vector V = clone();
+		V._values[i] = v_i;
+		return V;
 	}
-	public Vector mul(Vector n) 
+	public Vector add(Vector v) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		int d = Math.max(dim(), v.dim());
+		int p = Math.min(dim(), v.dim());
+		Vector u = new Vector (d);
+		INumber izero = _values[0].zero();
+		for (int i = 0; i < p; i++)
+			u._values[i] = _values[i].add(v._values[i]);
+		if (dim() < d)
+			for (int i = p; i < d; i++)
+				u._values[i] = v._values[i].add(izero);
+		else
+			for (int i = p; i < d; i++)
+				u._values[i] = _values[i].add(izero);
+		return u;
+	}
+	public Vector sub(Vector v) 
+	{
+		int d = Math.max(dim(), v.dim());
+		int p = Math.min(dim(), v.dim());
+		Vector u = new Vector (d);
+		INumber izero = _values[0].zero();
+		for (int i = 0; i < p; i++)
+			u._values[i] = _values[i].sub(v._values[i]);
+		if (dim() < d)
+			for (int i = p; i < d; i++)
+				u._values[i] = v._values[i].sub(izero);
+		else
+			for (int i = p; i < d; i++)
+				u._values[i] = _values[i].sub(izero);
+		return u;
+	}
+	public INumber scalarMul(Vector v) 
+	{
+		int d = Math.min(dim(), v.dim());
+		INumber scalar = _values[0].zero();
+		for (int i = 0; i < d; i++)
+			scalar = scalar.add(_values[i].mul(v.component(i)));
+		return scalar;
+	}
+	// it decides that 'this' is the column-vector & 'v' is row-vector
+	// so result of this*v is 2d-tenzor (or just matrix)
+	public Tenzor mulT(Vector v) 
+	{
+		return new Tenzor(this, v);
 	}
 	public Vector kmul(INumber k)
 	{
@@ -53,4 +105,5 @@ public class Vector {
 	}
 
 	private INumber []_values;
+
 }
